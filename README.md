@@ -7,7 +7,7 @@
 - Implemented an **MLP handwriting recognition classification model** from scratch using **C++** and **CUDA**, including tensor operations and network computation on the GPU.
 - **Lab1** completes all the operation header function for tensor: `op_elemwise.cuh`, `op_mm.cuh`, `op_reduction.cuh`. After filling them, we can pass some unit process, but can't realize this network
 -  **Lab2** completes detailed implementation of network, mainly `linear.cuh` and `mlp.cuh`
-- **Accuracy**: Eventually it should be possible to obtain a multilayer perceptron model (MLP) with about the same accuracy as the pytorch version: between 97%-99+%. The final accuracy on test set is 98.26%.
+- **Accuracy**: Eventually it should be possible to obtain a multilayer perceptron model (MLP) with about the same accuracy as the pytorch version: between 97%-99+%.
 - **Plus**: I'm wondering how much speed it can improve compared to the PyTorch version. I will try this part.
 
 ## Dataset - MINST
