@@ -31,7 +31,8 @@ public:
         activ.reserve(layer_dims.size() - 1);
         d_activ.reserve(layer_dims.size() - 1);
         for (int i = 0; i < layer_dims.size() - 1; i++)
-        {
+        {   
+            //std::cout << "activ[" << i << "] has size" << batch_size << " * " <<layer_dims[i]<<std::endl;
             activ.emplace_back(Tensor<T>(batch_size, layer_dims[i], gpu));
             // technically, i do not need to save d_activ for backprop, but since iterative
             // training does repeated backprops, reserving space for these tensor once is a good idea
@@ -61,8 +62,18 @@ public:
     //Except for the last layer, it should invoke Relu activation after each layer.
     void forward(const Tensor<T> &in, Tensor<T> &out)
     {
-      //Lab-2: add your code here
-
+        //Lab-2: add your code here
+        Tensor<T> current = in;
+        for (int i = 0; i < layers.size() - 1; i++){
+            //std::cout << "Before layer " << i << " forward call:" << std::endl;
+            //std::cout << "current dimensions: (" << current.h << ", " << current.w << ")" << std::endl;
+            //std::cout << "activ[" << i << "] dimensions: (" << activ[i].h << ", " << activ[i].w << ")" << std::endl;
+            
+            layers[i].forward(current, activ[i]);
+            op_relu(activ[i], activ[i]);
+            current = activ[i];
+        }
+        layers[layers.size()-1].forward(current, out);
     }
 
     //This function perofmrs the backward operation of a MLP model.
@@ -70,18 +81,15 @@ public:
     //Invoke the backward function of each linear layer and Relu from the last one to the first one.
     void backward(const Tensor<T> &in, const Tensor<T> &d_out, Tensor<T> &d_in)
     {
-        for (int i = layers.size() - 1; i >= 0; i--)
-        {
-            const Tensor<T> &x = (i > 0) ? activ[i - 1] : in;
-            const Tensor<T> &d_y = (i < layers.size() - 1) ? d_activ[i] : d_out;
-            Tensor<T> &d_x = (i > 0) ? d_activ[i - 1] : d_in;
-            layers[i].backward(x, d_y, d_x);
-
-            if (i > 0)
-            {
-                op_relu_back(x, d_x, d_x);
-                d_activ[i - 1] = d_x;
-            }
+        //Lab-2: add your code here
+        Tensor<T> current_grad = d_out;
+        for (int i = layers.size() - 1; i > 0; i--) {
+            layers[i].backward(activ[i - 1], current_grad, d_activ[i - 1]);
+            // Apply gradient of ReLU for all but the last layer
+            op_relu_back(activ[i - 1], d_activ[i - 1], d_activ[i - 1]);
+            current_grad = d_activ[i - 1];
         }
+        // last layer
+        layers[0].backward(in, current_grad, d_in);
     }
 };

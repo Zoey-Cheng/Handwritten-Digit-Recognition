@@ -86,9 +86,6 @@ __global__ void op_reduction_kernel_rowwise(OpFunc f, Tensor<T> in, Tensor<T> ou
 template <typename OpFunc, typename T>
 void op_reduction_gpu(OpFunc f, const Tensor<T> &in, Tensor<T> &out, Tensor<int> &out_index, bool get_index = false)
 {   
-    // add lab-1
-    int threadsPerBlock(256);
-    dim3 blocksPerGrid;
 
     int out_h = out.h;
     if (!get_index) {
@@ -97,21 +94,25 @@ void op_reduction_gpu(OpFunc f, const Tensor<T> &in, Tensor<T> &out, Tensor<int>
         out_h = out_index.h;
         assert((out_index.h == 1 && in.w == out_index.w) || (out_index.w == 1 && in.h == out_index.h));
     }
+
+    dim3 blockSize(256);
+    dim3 gridSize;
+
     if (in.h > out_h)
     {
         //Lab-1: add your code here to launch op_reduction_kernel_rowwise
         //delete assert(0) when you are finished
         //assert(0);
-        blocksPerGrid.x = (in.w + threadsPerBlock - 1) / threadsPerBlock;
-        op_reduction_kernel_rowwise<<<blocksPerGrid, threadsPerBlock>>>(f, in, out, out_index, get_index);
+        gridSize = dim3((in.w + blockSize.x - 1) / blockSize.x);
+        op_reduction_kernel_colwise<<<gridSize, blockSize>>>(f, in, out, out_index, get_index);
     }
     else
     {
         //Lab-1: add your code here to launch op_reduction_kernel_colwise
         //delete assert(0) when you are finished
         //assert(0);
-        blocksPerGrid.x = (in.h + threadsPerBlock - 1) / threadsPerBlock;
-        op_reduction_kernel_colwise<<<blocksPerGrid, threadsPerBlock>>>(f, in, out, out_index, get_index);
+        gridSize = dim3((in.h + blockSize.x - 1) / blockSize.x);
+        op_reduction_kernel_rowwise<<<gridSize, blockSize>>>(f, in, out, out_index, get_index);
     }
 
     cudaAssert(cudaPeekAtLastError());

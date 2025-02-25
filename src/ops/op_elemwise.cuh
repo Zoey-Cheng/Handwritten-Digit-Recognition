@@ -109,7 +109,8 @@ public:
     __host__ __device__ OutT operator()(AT a, BT b)
     {
         //Lab-2: add your code here (delete return 0)
-        return 0;
+        //return 0;
+        return a == b ? 1 : 0;
     }
 
 };
@@ -123,7 +124,8 @@ public:
     __host__ __device__ T operator()(T x)
     {
         //Lab-2: add your code here (delete return 0)
-        return 0;
+        //return 0;
+        return x > 0 ? x : 0;
     }
 };
 
@@ -136,7 +138,8 @@ public:
     __host__ __device__ T operator()(T x, T dy)
     {
         //Lab-2: add your code here (delete return 0)
-        return 0;
+        //return 0;
+        return x > 0 ? dy : 0;
     }
 };
 

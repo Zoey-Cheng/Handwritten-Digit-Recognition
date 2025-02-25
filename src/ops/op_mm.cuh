@@ -22,6 +22,9 @@ __global__ void MatrixMultiKernal(const Tensor<T> A, const Tensor<T> B, Tensor<T
 template <typename T>
 void op_mm(const Tensor<T>& A, const Tensor<T>& B, Tensor<T>& C)
 {
+    //std::cout << "A = " << A.h << "*" << A.w << std::endl;
+    //std::cout << "B = " << B.h * B.w << std::endl;
+    //std::cout << "C = " << C.h * C.w << std::endl;
     assert(A.h == C.h && B.w == C.w && A.w == B.h);
     assert(A.on_device && B.on_device && C.on_device);
 
